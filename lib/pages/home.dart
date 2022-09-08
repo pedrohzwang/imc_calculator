@@ -13,13 +13,15 @@ class _HomeState extends State<Home> {
 
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  String _infoText = 'Informe seus dados!';
+  static const defaultTextValue = 'Informe seus dados!';
+  String _infoText = defaultTextValue;
 
   void _resetFields() {
     weightController.clear();
     heightController.clear();
     setState(() {
-      _infoText = 'Informe seus dados!';
+      _infoText = defaultTextValue;
+      _formKey = GlobalKey<FormState>();  
     });
   }
 
@@ -40,7 +42,7 @@ class _HomeState extends State<Home> {
         _infoText = "Obesidade Grau I ($imcString)";
       } else if (imc >= 34.9 && imc < 39.9) {
         _infoText = "Obesidade Grau II ($imcString)";
-      } else if (imc >= 40)  {
+      } else if (imc >= 40) {
         _infoText = "Obesidade Grau III ($imcString)";
       }
     });
@@ -81,6 +83,11 @@ class _HomeState extends State<Home> {
                   ),
                 ),
                 textAlign: TextAlign.center,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Informe um valor!';
+                  }
+                },
               ),
               TextFormField(
                 controller: heightController,
@@ -93,13 +100,26 @@ class _HomeState extends State<Home> {
                   ),
                 ),
                 textAlign: TextAlign.center,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Informe um valor!';
+                  }
+                },
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 30, bottom: 20),
                 child: SizedBox(
                   height: 65,
                   child: ElevatedButton(
-                    onPressed: _calculate,
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        _calculate();
+                      } else {
+                        setState(() {
+                          _infoText = defaultTextValue;
+                        });
+                      }
+                    },
                     child: const Text("CALCULAR"),
                   ),
                 ),
